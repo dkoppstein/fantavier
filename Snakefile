@@ -36,7 +36,7 @@ rule concat:
 #        ''
 
 rule porechop:
-    input: rules.output.concat
+    input: rules.concat.output
     output: '3_porechop/output.fastq'
     shell:
         '{CUSTOM_CONDA3} porechop '

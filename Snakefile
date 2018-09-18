@@ -19,7 +19,7 @@ rule basecall:
         '-t {threads} '
         '-i {INPUT_DIR} '
         '-c {ALBACORE_CONFIG_FILE} '
-        '-s 1_basecalled'
+        '-s 1_basecalled '
         '-o fastq'
 
 rule concat:

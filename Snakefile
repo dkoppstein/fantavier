@@ -98,10 +98,13 @@ rule canu:
         '-nanopore-raw '
         ' {input}'
 
+# from https://github.com/caspargross/hybridAssembly/blob/master/main.nf
 rule miniasm:
     input: rules.filter.output
-    output: '4_miniasm/assembled.fasta'
+    output:
+        fasta='4_miniasm/assembled.fasta',
+        gfa='4_miniasm/miniasm_graph.gfa'
     shell:
         "{CONDA} minimap2 -x ava-ont {input} {input} > 4_miniasm/overlap.paf; "
-        "{CONDA} miniasm -f {input} 4_miniasm/overlap.paf > 4_miniasm/miniasm_graph.gfa; "
-        '''awk '/^S/{print ">"\$2"\\n"\$3}' 4_miniasm/miniasm_graph.gfa | fold > {output}'''
+        "{CONDA} miniasm -f {input} 4_miniasm/overlap.paf > {output.gfa}; "
+        '''awk '/^S/{print ">"\$2"\\n"\$3}' 4_miniasm/miniasm_graph.gfa | fold > {output.fasta}'''

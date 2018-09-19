@@ -108,3 +108,18 @@ rule miniasm:
         "{CONDA} minimap2 -x ava-ont {input} {input} > 4_miniasm/overlap.paf; "
         "{CONDA} miniasm -f {input} 4_miniasm/overlap.paf > {output.gfa}; "
         '''awk '/^S/{print ">"\$2"\\n"\$3}' 4_miniasm/miniasm_graph.gfa | fold > {output.fasta}'''
+
+rule racon:
+    input:
+        assembly=rules.miniasm.output.fasta,
+        filtered=rules.filter.output
+    output:
+        paf='5_racon/assembly_map.paf',
+        consensus='5_racon/assembly_consensus.fasta'
+    threads: THREADS
+    shell:
+        '{CONDA} minimap2 -x map-ont '
+        '-t {threads} {input.assembly} {input.filtered} '
+        '> {output.paf}; '
+        '{CUSTOM_CONDA3} racon -t {threads} '
+        '{input.filtered} {output.paf} {input.assembly} {output.consensus}'

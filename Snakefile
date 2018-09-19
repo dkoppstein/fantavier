@@ -56,16 +56,15 @@ rule plot_quals:
     input: '{somefile}.fastq'
     output: '{somefile}/NanoPlot-report.html'
     threads: THREADS
-    run:
-        outdir = pjoin(dirname(str())
-        shell('{CUSTOM_CONDA3} NanoPlot '
-              '--fastq {input} '
-              '-t {threads} '
-              '--loglength '
-              '-o {wildcards.somefile} '
-              '--maxlength 100000 '
-              '--percentqual '
-              '--plots hex dot'
+    shell:
+        '{CUSTOM_CONDA3} NanoPlot '
+        '--fastq {input} '
+        '-t {threads} '
+        '--loglength '
+        '-o {wildcards.somefile} '
+        '--maxlength 100000 '
+        '--percentqual '
+        '--plots hex dot'
 
 rule filter:
     input:

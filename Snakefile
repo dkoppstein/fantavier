@@ -53,7 +53,7 @@ rule canu:
     input: rules.porechop.output
     output: '2_canu/output.fastq'
     shell:
-        'canu -d 2_canu '
+        '{CONDA} canu -d 2_canu '
         '-p output '
         '-nanopore-raw '
         'genomeSize={CHROM_20_SIZE} {input}'

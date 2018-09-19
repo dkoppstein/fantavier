@@ -102,8 +102,8 @@ rule canu:
 rule miniasm:
     input: rules.filter.output
     output:
-        fasta=protected('4_miniasm/assembled.fasta'),
-        gfa=protected('4_miniasm/miniasm_graph.gfa')
+        fasta='4_miniasm/assembled.fasta',
+        gfa='4_miniasm/miniasm_graph.gfa'
     shell:
         "set +u; {CONDA} minimap2 -x ava-ont {input} {input} > 4_miniasm/overlap.paf; "
         "{CONDA} miniasm -f {input} 4_miniasm/overlap.paf > {output.gfa}; "

@@ -12,7 +12,7 @@ def main(argv):
     d = defaultdict(int)
     for read in SeqIO.parse(opts.infile, 'fastq'):
         d[read.name] += 1
-        read.name = str(read.name) + '-' + str(d[read])
+        read.name = str(read.name) + '-' + str(d[read.name])
         print(read.format('fastq'), file=opts.outfile)
 
 if __name__ == '__main__':

@@ -1,0 +1,57 @@
+input file: BaseCalling//sequencing_summary.txt
+All reads:
+  total.gigabases: 0.0223784
+  total.reads: 2772
+  N50.length: 13531.0
+  mean.length: 8073.0
+  median.length: 5354.0
+  max.length: 96670.0
+  mean.q: 6.1
+  median.q: 6.6
+  reads:
+    '>10kb': 759
+    '>20kb': 213
+    '>50kb': 25
+    '>100kb': 0
+    '>200kb': 0
+    '>500kb': 0
+    '>1m': 0
+    ultralong: 0.0
+  gigabases:
+    '>10kb': 0.0145899
+    '>20kb': 0.007041
+    '>50kb': 0.0015662
+    '>100kb': 0.0
+    '>200kb': 0.0
+    '>500kb': 0.0
+    '>1m': 0.0
+    ultralong: 0.0
+Q>=7:
+  total.gigabases: 0.0095655
+  total.reads: 1249
+  N50.length: 11590.0
+  mean.length: 7658.5
+  median.length: 5677.0
+  max.length: 96670.0
+  mean.q: 8.7
+  median.q: 8.8
+  reads:
+    '>10kb': 326
+    '>20kb': 66
+    '>50kb': 3
+    '>100kb': 0
+    '>200kb': 0
+    '>500kb': 0
+    '>1m': 0
+    ultralong: 0.0
+  gigabases:
+    '>10kb': 0.0056366
+    '>20kb': 0.0020546
+    '>50kb': 0.0002324
+    '>100kb': 0.0
+    '>200kb': 0.0
+    '>500kb': 0.0
+    '>1m': 0.0
+    ultralong: 0.0
+notes: ultralong reads refers to the largest set of reads with N50>100KB
+

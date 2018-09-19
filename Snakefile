@@ -111,8 +111,8 @@ rule miniasm:
 
 rule racon:
     input:
-        assembly=rules.miniasm.output.fasta,
-        filtered=rules.filter.output
+        assembly=str(rules.miniasm.output.fasta),
+        filtered=str(rules.filter.output)
     output:
         paf='5_racon/assembly_map.paf',
         consensus='5_racon/assembly_consensus.fasta'

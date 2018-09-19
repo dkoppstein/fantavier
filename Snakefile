@@ -1,11 +1,14 @@
 
 from os.path import dirname
+from os.path import join as pjoin
 
 # parameters
 INPUT_DIR = 'fast5'
 #ONT_KIT = 'FLO-MIN106'
 ALBACORE_CONFIG_FILE = 'r94_450bps_linear.cfg'
 THREADS = 2
+LOWER_BOUND_LENGTH = '300'
+KEEP_PERCENT = '90'
 CONDA = 'source activate humansv && '
 CONDA3 = 'source activate humansvp3 && '
 CUSTOM_CONDA3 = 'source activate /home/dkoppstein/envs/py3 && '
@@ -42,18 +45,46 @@ CHROM_20_SIZE = '63m'
 #        ''
 
 rule porechop:
-    input: 'input/chr20.fastq'
-    output: '1_porechop/output.fastq'
+    input: 'data/chr20.fastq'
+    output: '1_porechop/output.fastq.gz'
     shell:
         '{CUSTOM_CONDA3} porechop '
         '-i {input} '
-        '-o 1_porechop/output.fastq'
+        '| gzip -9 > {output}'
+
+rule plot_quals:
+    input: '{somefile}.fastq'
+    output: '{somefile}/NanoPlot-report.html'
+    threads: THREADS
+    run:
+        outdir = pjoin(dirname(str())
+        shell('{CUSTOM_CONDA3} NanoPlot '
+              '--fastq {input} '
+              '-t {threads} '
+              '--loglength '
+              '-o {wildcards.somefile} '
+              '--maxlength 100000 '
+              '--percentqual '
+              '--plots hex dot'
+
+rule filter:
+    input:
+        fastq=rules.porechop.output,
+        reference='data/chr20.fa.gz'
+    output: '2_filtered/output.fastq.gz'
+    shell:
+        '{CUSTOM_CONDA3} filtlong '
+        '-a {input.reference} '
+        '--min_length {LOWER_BOUND_LENGTH} '
+        '--keep_percent {KEEP_PERCENT} '
+        '{input.fastq} '
+        '| gzip -9 > {output}
 
 rule canu:
-    input: rules.porechop.output
-    output: '2_canu/output.fastq'
+    input: rules.filter.output
+    output: '3_canu/output.fastq'
     shell:
-        '{CONDA} canu -d 2_canu '
+        '{CONDA} canu -d 3_canu '
         '-p output '
         'genomeSize={CHROM_20_SIZE} '
         '-nanopore-raw '

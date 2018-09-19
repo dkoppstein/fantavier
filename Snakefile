@@ -55,5 +55,6 @@ rule canu:
     shell:
         '{CONDA} canu -d 2_canu '
         '-p output '
+        'genomeSize={CHROM_20_SIZE} '
         '-nanopore-raw '
-        'genomeSize={CHROM_20_SIZE} {input}'
+        ' {input}'

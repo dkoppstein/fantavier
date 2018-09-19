@@ -77,11 +77,11 @@ rule filter:
         '--min_length {LOWER_BOUND_LENGTH} '
         '--keep_percent {KEEP_PERCENT} '
         '{input.fastq} '
-        '| gzip -9 > {output}
+        '| gzip -9 > {output}'
 
 rule canu:
     input: rules.filter.output
-    output: '3_canu/output.fastq'
+    output: '3_canu/output.fasta'
     shell:
         '{CONDA} canu -d 3_canu '
         '-p output '

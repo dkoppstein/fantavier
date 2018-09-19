@@ -11,8 +11,8 @@ def main(argv):
     opts = parser.parse_args(argv)
     d = defaultdict(int)
     for read in SeqIO.parse(opts.infile, 'fastq'):
-        d[read.name] += 1
-        read.name = str(read.name) + '-' + str(d[read.name])
+        d[read.description] += 1
+        read.description = str(read.description) + '-' + str(d[read.description])
         print(read.format('fastq'), file=opts.outfile)
 
 if __name__ == '__main__':

@@ -97,3 +97,11 @@ rule canu:
         'genomeSize={CHROM_20_SIZE} '
         '-nanopore-raw '
         ' {input}'
+
+rule miniasm:
+    input: rules.filter.output
+    output: '4_miniasm/assembled.fasta'
+    shell:
+        "{CONDA} minimap2 -x ava-ont {input} {input} > 4_miniasm/overlap.paf; "
+        "{CONDA} miniasm -f {input} 4_miniasm/overlap.paf > 4_miniasm/miniasm_graph.gfa; "
+        '''awk '/^S/{print ">"\$2"\\n"\$3}' 4_miniasm/miniasm_graph.gfa | fold > {output}'''

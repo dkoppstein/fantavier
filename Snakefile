@@ -43,7 +43,7 @@ CHROM_20_SIZE = '63m'
 
 rule porechop:
     input: 'input/chr20.fastq'
-    output: '1_porechop/output.fastq.gz'
+    output: '1_porechop/output.fastq'
     shell:
         '{CUSTOM_CONDA3} porechop '
         '-i {input} '

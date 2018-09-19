@@ -118,7 +118,7 @@ rule racon:
         consensus='5_racon/assembly_consensus.fasta'
     threads: THREADS
     shell:
-        '{CONDA} minimap2 -x map-ont '
+        'set +u; {CONDA} minimap2 -x map-ont '
         '-t {threads} {input.assembly} {input.filtered} '
         '> {output.paf}; '
         '{CUSTOM_CONDA3} racon -t {threads} '

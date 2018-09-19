@@ -12,6 +12,7 @@ KEEP_PERCENT = '90'
 CONDA = 'source activate humansv && '
 CONDA3 = 'source activate humansvp3 && '
 CUSTOM_CONDA3 = 'source activate /home/dkoppstein/envs/py3 && '
+QUAST = 'source activate /home/cgross/envs/quast && '
 HUMAN_SV_SOURCE_FILE = '/mnt/humanSV/.humansv'
 CHROM_20_SIZE = '63m'
 
@@ -78,7 +79,7 @@ rule plot_quals:
 rule filter:
     input:
         fastq=rules.preprocess.output,
-        reference='data/chr20.fa.gz'
+        reference='db/chr20_GRCh38.fa.gz'
     output: '2_filtered/output.fastq.gz'
     shell:
         '{CUSTOM_CONDA3} filtlong '
@@ -123,3 +124,11 @@ rule racon:
         '> {output.paf}; '
         '{CUSTOM_CONDA3} racon -t {threads} '
         '{input.filtered} {output.paf} {input.assembly} {output.consensus}'
+
+# rule nucmer:
+#     input:
+#     output:
+#     shell:
+#         'nucmer -maxmatch -l 100 '
+#         '-c 500 -p my_fav_alignment '
+#         'data/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa data/pilon_yeast_Aug2018.fasta'

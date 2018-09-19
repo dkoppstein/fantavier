@@ -13,6 +13,7 @@ def main(argv):
     for read in SeqIO.parse(opts.infile, 'fastq'):
         d[read.id] += 1
         read.id = str(read.id) + '-' + str(d[read.id])
+        read.description = ''
         print(read.format('fastq'), file=opts.outfile)
 
 if __name__ == '__main__':

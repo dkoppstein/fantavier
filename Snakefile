@@ -44,12 +44,21 @@ CHROM_20_SIZE = '63m'
 #         '{CONDA3} NanoFilt '
 #        ''
 
+
 rule porechop:
     input: 'data/chr20.fastq'
     output: '1_porechop/output.fastq.gz'
     shell:
         '{CUSTOM_CONDA3} porechop '
         '-i {input} '
+        '| gzip -9 > {output}'
+
+rule preprocess:
+    input: rules.porechop.output
+    output: '2_preprocessed/output.fastq.gz'
+    shell:
+        '{CONDA3} gunzip -c {input} | '
+        'python3 scripts/deduplicate.py '
         '| gzip -9 > {output}'
 
 rule plot_quals:
@@ -68,7 +77,7 @@ rule plot_quals:
 
 rule filter:
     input:
-        fastq=rules.porechop.output,
+        fastq=rules.preprocess.output,
         reference='data/chr20.fa.gz'
     output: '2_filtered/output.fastq.gz'
     shell:

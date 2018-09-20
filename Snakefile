@@ -130,7 +130,7 @@ rule racon:
 
 rule gunzip:
     input: '{somefile}.gz'
-    output: tmp('{somefile}')
+    output: temp('{somefile}')
     shell: 'gunzip -c {input} > {output}'
 
 rule nucmer:

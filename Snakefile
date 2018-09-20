@@ -12,9 +12,11 @@ KEEP_PERCENT = '90'
 CONDA = 'source activate humansv && '
 CONDA3 = 'source activate humansvp3 && '
 CUSTOM_CONDA3 = 'source activate /home/dkoppstein/envs/py3 && '
-QUAST = 'source activate /home/cgross/envs/quast && '
+CONDA_QUAST = 'source activate /home/cgross/envs/quast && '
 HUMAN_SV_SOURCE_FILE = '/mnt/humanSV/.humansv'
 CHROM_20_SIZE = '63m'
+REFERENCE_GENOME = 'db/chr20.fa.gz'
+REFERENCE_GENOME_UNZIPPED = 'db/chr20.fa'
 
 # rule basecall:
 #     output: '1_basecalls/.sentinel'
@@ -124,12 +126,56 @@ rule racon:
         '-t {threads} {input.assembly} {input.filtered} '
         '> {output.paf}; '
         '{CUSTOM_CONDA3} racon -t {threads} '
-        '{input.filtered} {output.paf} {input.assembly} {output.consensus}'
+        '{input.filtered} {output.paf} {input.assembly} > {output.consensus}'
 
-# rule nucmer:
-#     input:
-#     output:
-#     shell:
-#         'nucmer -maxmatch -l 100 '
-#         '-c 500 -p my_fav_alignment '
-#         'data/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa data/pilon_yeast_Aug2018.fasta'
+rule gunzip:
+    input: '{somefile}.gz'
+    output: tmp('{somefile}')
+    shell: 'gunzip -c {input} > {output}'
+
+rule nucmer:
+    input:
+        reference=REFERENCE_GENOME_UNZIPPED,
+        consensus=rules.racon.output.consensus
+    output: '6_nucmer/nucmer_alignment.delta'
+    shell:
+        'nucmer -maxmatch -l 100 '
+        '-c 500 -p nucmer_alignment '
+        '{input.reference} {input.consensus}'
+
+rule assemblytics:
+    input: rules.nucmer.output
+    output: '7_assemblytics/.sentinel'
+    shell:
+        'export PATH=/mnt/humanSV/software/Assemblytics:${PATH}; '
+        '{CONDA} Assemblytics {input} 7_assemblytics/assemblytics 10000 /mnt/humanSV/software/Assemblytics; '
+        'touch {output}'
+
+rule quast:
+    input:
+        reference=REFERENCE_GENOME_UNZIPPED,
+        filtered=rules.filter.output,
+        assembly=rules.racon.output.consensus
+    output:
+        report='7_quast_results/latest/report.txt'
+    threads: THREADS
+    shell:
+        '{CONDA_QUAST} quast {input.filtered} -R {input.reference} '
+
+## alignment branch
+rule ngmlr:
+    input:
+        reference='db/chr20_GRCh38.fa.gz',
+        reads=rules.filter.output
+    output: 'alignment/ngmlr/output.sorted.bam'
+    threads: THREADS
+    shell:
+        '{CONDA} gunzip -c {input.reads} | '
+        'ngmlr -t {threads} -r {input.reference} -x ont | '
+        'samtools sort -@ {threads} -o {output} - '
+
+rule sniffles:
+    input: rules.ngmlr.output
+    output: 'alignment/sniffles/output.vcf'
+    shell:
+        '{CONDA} source {HUMAN_SV_SOURCE_FILE} && sniffles -m {input} -v {output}'

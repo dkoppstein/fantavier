@@ -158,7 +158,7 @@ rule assemblytics:
     input: rules.nucmer.output
     output: '8_assemblytics/assemblytics.sentinel'
     shell:
-        'export PATH=/mnt/humanSV/software/Assemblytics:${PATH}; '
+        'export PATH=/mnt/humanSV/software/Assemblytics:$PATH; '
         '{CONDA} Assemblytics {input} 8_assemblytics/assemblytics 10000 /mnt/humanSV/software/Assemblytics; '
         'touch {output}'
 
@@ -168,7 +168,7 @@ rule quast:
         filtered=rules.filter.output,
         assembly=rules.racon.output.consensus
     output:
-        report='7_quast_results/latest/report.txt'
+        report='9_quast_results/latest/report.txt'
     threads: THREADS
     shell:
         '{CONDA_QUAST} quast {input.filtered} --eukaryote -R {input.reference} '

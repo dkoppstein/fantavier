@@ -150,16 +150,16 @@ rule nucmer:
         consensus=rules.racon_round2.output.consensus
     output: '7_nucmer/nucmer_alignment.delta'
     shell:
-        'nucmer -maxmatch -l 100 '
-        '-c 500 -p nucmer_alignment '
+        '{CUSTOM_CONDA3} nucmer -maxmatch -l 100 '
+        '-c 500 -p 7_nucmer/nucmer_alignment '
         '{input.reference} {input.consensus}'
 
 rule assemblytics:
     input: rules.nucmer.output
-    output: '7_assemblytics/.sentinel'
+    output: '8_assemblytics/assemblytics.sentinel'
     shell:
         'export PATH=/mnt/humanSV/software/Assemblytics:${PATH}; '
-        '{CONDA} Assemblytics {input} 7_assemblytics/assemblytics 10000 /mnt/humanSV/software/Assemblytics; '
+        '{CONDA} Assemblytics {input} 8_assemblytics/assemblytics 10000 /mnt/humanSV/software/Assemblytics; '
         'touch {output}'
 
 rule quast:

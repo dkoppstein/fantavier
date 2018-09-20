@@ -103,7 +103,7 @@ rule canu:
 rule miniasm:
     input: rules.filter.output
     output:
-        paf='4_miniasm/overlap.paf'
+        paf='4_miniasm/overlap.paf',
         fasta='4_miniasm/assembled.fasta',
         gfa='4_miniasm/miniasm_graph.gfa'
     shell:
@@ -113,8 +113,8 @@ rule miniasm:
 
 rule racon:
     input:
-        assembly=str(rules.miniasm.output.fasta),
-        filtered=str(rules.filter.output)
+        assembly=rules.miniasm.output.fasta,
+        filtered=rules.filter.output
     output:
         paf='5_racon/assembly_map.paf',
         consensus='5_racon/assembly_consensus.fasta'

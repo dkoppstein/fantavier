@@ -15,8 +15,8 @@ CUSTOM_CONDA3 = 'source activate /home/dkoppstein/envs/py3 && '
 CONDA_QUAST = 'source activate /home/cgross/envs/quast && '
 HUMAN_SV_SOURCE_FILE = '/mnt/humanSV/.humansv'
 CHROM_20_SIZE = '63m'
-REFERENCE_GENOME = 'db/chr20.fa.gz'
 REFERENCE_GENOME_UNZIPPED = 'db/chr20.fa'
+REFERENCE_GENOME = REFERENCE_GENOME_UNZIPPED + '.gz'
 
 # rule basecall:
 #     output: '1_basecalls/.sentinel'
@@ -113,6 +113,12 @@ rule miniasm:
         "{CONDA} miniasm -f {input} {output.paf} > {output.gfa}; "
         "bash scripts/fold_fasta.sh {output.gfa} > {output.fasta}"
 
+RACON_COMMAND = ('set +u; {CONDA} minimap2 -x map-ont '
+                 '-t {threads} {input.assembly} {input.filtered} '
+                 '> {output.paf}; '
+                 '{CUSTOM_CONDA3} racon -t {threads} '
+                 '{input.filtered} {output.paf} {input.assembly} > {output.consensus}')
+
 rule racon:
     input:
         assembly=rules.miniasm.output.fasta,
@@ -121,12 +127,17 @@ rule racon:
         paf='5_racon/assembly_map.paf',
         consensus='5_racon/assembly_consensus.fasta'
     threads: THREADS
-    shell:
-        'set +u; {CONDA} minimap2 -x map-ont '
-        '-t {threads} {input.assembly} {input.filtered} '
-        '> {output.paf}; '
-        '{CUSTOM_CONDA3} racon -t {threads} '
-        '{input.filtered} {output.paf} {input.assembly} > {output.consensus}'
+    shell: RACON_COMMAND
+
+rule racon_round2:
+    input:
+        assembly=rules.racon.output.consensus,
+        filtered=rules.filter.output
+    output:
+        paf='6_racon_round2/assembly_map.paf',
+        consensus='6_racon_round2/assembly_consensus.fasta'
+    threads: THREADS
+    shell: RACON_COMMAND
 
 rule gunzip:
     input: '{somefile}.gz'
@@ -136,8 +147,8 @@ rule gunzip:
 rule nucmer:
     input:
         reference=REFERENCE_GENOME_UNZIPPED,
-        consensus=rules.racon.output.consensus
-    output: '6_nucmer/nucmer_alignment.delta'
+        consensus=rules.racon_round2.output.consensus
+    output: '7_nucmer/nucmer_alignment.delta'
     shell:
         'nucmer -maxmatch -l 100 '
         '-c 500 -p nucmer_alignment '

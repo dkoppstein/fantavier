@@ -228,6 +228,15 @@ rule vcf2tab:
     shell:
         '{CONDA} python scripts/vcf2tab.py {input} > {output}'
 
+rule svpv:
+    input:
+        bam=rules.ngmlr.output,
+        vcf=rules.sniffles.output
+    output: '11_svpv/sentinel'
+    shell:
+        '{CONDA_QUAST} SVPV -vcf {input.vcf1} -aln {input.bam} -o 11_svpv '
+        'touch {output}'
+
 
 rule all:
     input:

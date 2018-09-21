@@ -171,7 +171,7 @@ rule quast:
         report='9_quast_results/latest/report.txt'
     threads: THREADS
     shell:
-        '{CONDA_QUAST} quast {input.filtered} --eukaryote -R {input.reference} '
+        '{CONDA_QUAST} quast {input.filtered} -R {input.reference} --large -o 9_quast '
 
 ## alignment branch
 rule ngmlr:

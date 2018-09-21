@@ -181,9 +181,11 @@ rule ngmlr:
     output: 'alignment/ngmlr/output.sorted.bam'
     threads: THREADS
     shell:
-        'rm -rf alignment/ngmlr/*.bam; {CONDA} gunzip -c {input.reads} | '
-        'ngmlr -t {threads} -r {input.reference} -x ont > alignment/ngmlr/output.tmp.sam; '
-        'samtools sort -@ {threads} -o output.sorted.bam alignment/ngmlr/output.tmp.sam'
+        'rm -rf alignment/ngmlr/*.bam; {CONDA} gunzip -c {input.reads} > alignment/ngmlr/unzipped_reads.tmp.fastq; '
+        'ngmlr -t {threads} -r {input.reference} -x ont -q alignment/ngmlr/unzipped_reads.tmp.fastq > alignment/ngmlr/output.tmp.sam;
+        'rm -f alignment/ngmlr/unzipped_reads.tmp.fastq; '
+        'samtools sort -@ {threads} -o output.sorted.bam alignment/ngmlr/output.tmp.sam; '
+        'rm -f alignment/ngmlr/output.tmp.sam'
 
 rule samtools_index:
     input: rules.ngmlr.output

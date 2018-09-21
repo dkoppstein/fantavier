@@ -218,7 +218,7 @@ rule survivor:
     params:
         bedfile=str(rules.assemblytics.output).replace('sentinel', 'Assemblytics_structural_variants.bed')
     shell:
-        '{CONDA_QUAST} SURVIVOR convertAssemblytics '
+        'set +u; {CONDA_QUAST} SURVIVOR convertAssemblytics '
         '{params.bedfile} 0 {output}'
 
 
@@ -232,9 +232,9 @@ rule svpv:
     input:
         bam=rules.ngmlr.output,
         vcf=rules.sniffles.output
-    output: '11_svpv/sentinel'
+    output: '11_svpv/sentinel.txt'
     shell:
-        '{CONDA_QUAST} SVPV -vcf {input.vcf1} -aln {input.bam} -o 11_svpv '
+        'set +u;{CONDA_QUAST} SVPV -vcf {input.vcf} -aln {input.bam} -o 11_svpv '
         'touch {output}'
 
 

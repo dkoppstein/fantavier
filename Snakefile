@@ -189,7 +189,7 @@ rule quast:
 ## alignment branch
 rule ngmlr:
     input:
-        reference='db/chr20_GRCh38.fa.gz',
+        reference='db/chr20.fa',
         reads=rules.filter.output
     output: 'alignment/ngmlr/output.sorted.bam'
     threads: THREADS
@@ -236,7 +236,7 @@ rule svpv:
         vcf=rules.sniffles.output
     output: '11_svpv/sentinel.txt'
     shell:
-        '{CONDA_QUAST} SVPV -vcf {input.vcf} -aln {input.bam} -o 11_svpv '
+        '{CONDA_QUAST} SVPV -vcf {input.vcf} -aln {input.bam} -o 11_svpv -samples output; '
         'touch {output}'
 
 

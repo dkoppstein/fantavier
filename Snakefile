@@ -201,7 +201,19 @@ rule sniffles:
     shell:
         '{CONDA} source {HUMAN_SV_SOURCE_FILE} && sniffles -m {input.bam} -v {output}'
 
+rule svpv:
+    input:
+        bam=rules.nmlr.output,
+        vcf1=rules.sniffles.output
+    output:
+        '10_svpv/sentinel'
+
+    shell:
+        '{CONDA_QUAST} SVPV -vcf {input.vcf1} -aln {input.bam} -o 10_svpv '
+        'touch 10_svpv/sentinel'
+
 rule all:
     input:
         sniffles=rules.sniffles.output,
         assemblytics=rules.assemblytics.output
+    

@@ -64,19 +64,30 @@ rule preprocess:
         'python3 scripts/deduplicate.py '
         '| gzip -9 > {output}'
 
-rule plot_quals:
-    input: '{somefile}.fastq'
-    output: '{somefile}/NanoPlot-report.html'
+NANOPLOT_CMD = ('{CUSTOM_CONDA3} NanoPlot '
+                '--fastq {input} '
+                '-t {threads} '
+                '--loglength '
+                '-o {params.outdir} '
+                '--maxlength 100000 '
+                '--percentqual '
+                '--plots hex dot')
+
+rule raw_plot_quals:
+    input: 'data/chr20.fastq'
+    output: 'plots/raw_quals/NanoPlot-report.html'
+    params:
+        outdir='plots/raw_quals'
     threads: THREADS
-    shell:
-        '{CUSTOM_CONDA3} NanoPlot '
-        '--fastq {input} '
-        '-t {threads} '
-        '--loglength '
-        '-o {wildcards.somefile} '
-        '--maxlength 100000 '
-        '--percentqual '
-        '--plots hex dot'
+    shell: NANOPLOT_CMD
+
+rule porechop_plot_quals:
+    input: rules.porechop.output
+    output: 'plots/porechop_quals/NanoPlot-report.html'
+    params:
+        outdir='plots/porechop_quals'
+    threads: THREADS
+    shell: NANOPLOT_CMD
 
 rule filter:
     input:
@@ -201,7 +212,25 @@ rule sniffles:
     shell:
         '{CONDA} source {HUMAN_SV_SOURCE_FILE} && sniffles -m {input.bam} -v {output}'
 
+rule survivor:
+    input: rules.assemblytics.output
+    output: '10_survivor/assemblytics_sv.vcf'
+    params:
+        bedfile=str(rules.assemblytics.output).replace('sentinel', 'Assemblytics_structural_variants.bed')
+    shell:
+        '{CONDA_QUAST} SURVIVOR convertAssemblytics '
+        '{params.bedfile} 0 {output}'
+
+
+rule vcf2tab:
+    input: '{somefile}.vcf'
+    output: '{somefile}.tab'
+    shell:
+        '{CONDA} python scripts/vcf2tab.py {input} > {output}'
+
+
 rule all:
     input:
-        sniffles=rules.sniffles.output,
-        assemblytics=rules.assemblytics.output
+        assemblytics=str(rules.survivor.output).replace('vcf', 'tab'),
+        sniffles=str(rules.sniffles.output).replace('vcf', 'tab'),
+        plot_quals=[rules.porechop_plot_quals.output, rules.raw_plot_quals.output]

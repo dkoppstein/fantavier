@@ -140,8 +140,8 @@ rule racon_round2:
     shell: RACON_COMMAND
 
 rule gunzip:
-    input: '{somefile}.gz'
-    output: temp('{somefile}')
+    input: REFERENCE_GENOME
+    output: temp(REFERENCE_GENOME_UNZIPPED)
     shell: 'gunzip -c {input} > {output}'
 
 rule nucmer:

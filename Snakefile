@@ -181,12 +181,20 @@ rule ngmlr:
     output: 'alignment/ngmlr/output.sorted.bam'
     threads: THREADS
     shell:
-        '{CONDA} gunzip -c {input.reads} | '
-        'ngmlr -t {threads} -r {input.reference} -x ont | '
-        'samtools sort -@ {threads} -o {output} - '
+        'rm -rf alignment/ngmlr/*.bam; {CONDA} gunzip -c {input.reads} | '
+        'ngmlr -t {threads} -r {input.reference} -x ont > alignment/ngmlr/output.tmp.sam; '
+        'samtools sort -@ {threads} -o output.sorted.bam alignment/ngmlr/output.tmp.sam'
+
+rule samtools_index:
+    input: rules.ngmlr.output
+    output: 'alignment/ngmlr/output.sorted.bam.bai'
+    shell:
+        '{CONDA} samtools index {input}'
 
 rule sniffles:
-    input: rules.ngmlr.output
+    input:
+        bam=rules.ngmlr.output,
+        idx=rules.samtools_index.output
     output: 'alignment/sniffles/output.vcf'
     shell:
-        '{CONDA} source {HUMAN_SV_SOURCE_FILE} && sniffles -m {input} -v {output}'
+        '{CONDA} source {HUMAN_SV_SOURCE_FILE} && sniffles -m {input.bam} -v {output}'

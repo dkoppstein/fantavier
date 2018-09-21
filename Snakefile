@@ -200,3 +200,8 @@ rule sniffles:
     output: 'alignment/sniffles/output.vcf'
     shell:
         '{CONDA} source {HUMAN_SV_SOURCE_FILE} && sniffles -m {input.bam} -v {output}'
+
+rule all:
+    input:
+        sniffles=rules.sniffles.output,
+        assemblytics=rules.assemblytics.output

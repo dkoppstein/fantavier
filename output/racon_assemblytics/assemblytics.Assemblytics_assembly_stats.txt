@@ -1,0 +1,16 @@
+Reference: chr20.fa
+Number of sequences: 1
+Total sequence length: 64.44 Mbp
+Mean: 64.44 Mbp
+Min: 64.44 Mbp
+Max: 64.44 Mbp
+N50: 64.44 Mbp
+
+
+Query: assembly_consensus.fasta
+Number of sequences: 47
+Total sequence length: 58.79 Mbp
+Mean: 1.25 Mbp
+Min: 3.67 Kbp
+Max: 13.01 Mbp
+N50: 5.34 Mbp

@@ -1,0 +1,16 @@
+Reference: chr20.fa
+Number of sequences: 1
+Total sequence length: 64.44 Mbp
+Mean: 64.44 Mbp
+Min: 64.44 Mbp
+Max: 64.44 Mbp
+N50: 64.44 Mbp
+
+
+Query: canu.chr20.nanonet.fasta
+Number of sequences: 43
+Total sequence length: 57.39 Mbp
+Mean: 1.33 Mbp
+Min: 40.31 Kbp
+Max: 12.31 Mbp
+N50: 5.08 Mbp

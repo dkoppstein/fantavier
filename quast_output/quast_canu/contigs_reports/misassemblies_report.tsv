@@ -1,0 +1,22 @@
+Assembly	canu.chr20.scrappie
+# misassemblies	12
+  # contig misassemblies	12
+    # c. relocations	12
+    # c. translocations	0
+    # c. inversions	0
+  # scaffold misassemblies	0
+    # s. relocations	0
+    # s. translocations	0
+    # s. inversions	0
+# misassembled contigs	8
+Misassembled contigs length	8654259
+# local misassemblies	1181
+# scaffold gap ext. mis.	0
+# scaffold gap loc. mis.	0
+# possible TEs	0
+# unaligned mis. contigs	12
+# mismatches	329592
+# indels	737352
+    # indels (<= 5 bp)	720455
+    # indels (> 5 bp)	16897
+Indels length	1266999

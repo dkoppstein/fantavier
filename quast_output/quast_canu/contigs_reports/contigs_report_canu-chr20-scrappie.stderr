@@ -1,0 +1,10 @@
+[M::mm_idx_gen::2.706*0.99] collected minimizers
+[M::mm_idx_gen::3.093*1.09] sorted minimizers
+[M::main::3.093*1.09] loaded/built the index for 1 target sequence(s)
+[M::mm_mapopt_update::3.200*1.08] mid_occ = 200
+[M::mm_idx_stat] kmer size: 19; skip: 19; is_hpc: 0; #seq: 1
+[M::mm_idx_stat::3.264*1.08] distinct minimizers: 5343152 (96.79% are singletons); average occurrences: 1.202; average spacing: 10.038
+[M::worker_pipeline::28.244*1.64] mapped 73 sequences
+[M::main] Version: 2.11-r797
+[M::main] CMD: /home/cgross/envs/quast/lib/python2.7/site-packages/quast_libs/minimap2/minimap2 -c -x asm5 --mask-level 0.9 --min-occ 200 -g 2500 --score-N 2 --cs -t 2 /home/cgross/fantavier/quast_result/quast_corrected_input/chr20.fa /home/cgross/fantavier/quast_result/quast_corrected_input/canu_chr20_scrappie.fasta
+[M::main] Real time: 28.279 sec; CPU: 46.452 sec

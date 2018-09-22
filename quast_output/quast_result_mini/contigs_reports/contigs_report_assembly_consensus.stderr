@@ -1,0 +1,10 @@
+[M::mm_idx_gen::2.789*0.99] collected minimizers
+[M::mm_idx_gen::3.155*1.11] sorted minimizers
+[M::main::3.155*1.11] loaded/built the index for 1 target sequence(s)
+[M::mm_mapopt_update::3.251*1.10] mid_occ = 200
+[M::mm_idx_stat] kmer size: 19; skip: 19; is_hpc: 0; #seq: 1
+[M::mm_idx_stat::3.311*1.10] distinct minimizers: 5343152 (96.79% are singletons); average occurrences: 1.202; average spacing: 10.038
+[M::worker_pipeline::47.270*1.89] mapped 64 sequences
+[M::main] Version: 2.11-r797
+[M::main] CMD: /home/cgross/envs/quast/lib/python2.7/site-packages/quast_libs/minimap2/minimap2 -c -x asm5 --mask-level 0.9 --min-occ 200 -g 2500 --score-N 2 --cs -t 2 /home/cgross/fantavier/quast_result/quast_result_mini/quast_corrected_input/chr20.fa /home/cgross/fantavier/quast_result/quast_result_mini/quast_corrected_input/assembly_consensus.fasta
+[M::main] Real time: 47.302 sec; CPU: 89.264 sec

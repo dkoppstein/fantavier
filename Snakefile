@@ -2,6 +2,8 @@
 from os.path import dirname
 from os.path import join as pjoin
 
+shell.prefix("set +u; ")
+
 # parameters
 INPUT_DIR = 'fast5'
 #ONT_KIT = 'FLO-MIN106'
@@ -120,11 +122,11 @@ rule miniasm:
         fasta='4_miniasm/assembled.fasta',
         gfa='4_miniasm/miniasm_graph.gfa'
     shell:
-        "set +u; {CONDA} minimap2 -x ava-ont {input} {input} > {output.paf}; "
+        "{CONDA} minimap2 -x ava-ont {input} {input} > {output.paf}; "
         "{CONDA} miniasm -f {input} {output.paf} > {output.gfa}; "
         "bash scripts/fold_fasta.sh {output.gfa} > {output.fasta}"
 
-RACON_COMMAND = ('set +u; {CONDA} minimap2 -x map-ont '
+RACON_COMMAND = ('{CONDA} minimap2 -x map-ont '
                  '-t {threads} {input.assembly} {input.filtered} '
                  '> {output.paf}; '
                  '{CUSTOM_CONDA3} racon -t {threads} '
@@ -187,7 +189,7 @@ rule quast:
 ## alignment branch
 rule ngmlr:
     input:
-        reference='db/chr20_GRCh38.fa.gz',
+        reference='db/chr20.fa',
         reads=rules.filter.output
     output: 'alignment/ngmlr/output.sorted.bam'
     threads: THREADS
@@ -232,9 +234,9 @@ rule svpv:
     input:
         bam=rules.ngmlr.output,
         vcf=rules.sniffles.output
-    output: '11_svpv/sentinel'
+    output: '11_svpv/sentinel.txt'
     shell:
-        '{CONDA_QUAST} SVPV -vcf {input.vcf1} -aln {input.bam} -o 11_svpv '
+        '{CONDA_QUAST} SVPV -vcf {input.vcf} -aln {input.bam} -o 11_svpv -samples output; '
         'touch {output}'
 
 

@@ -2,6 +2,8 @@
 from os.path import dirname
 from os.path import join as pjoin
 
+shell.prefix("set +u; ")
+
 # parameters
 INPUT_DIR = 'fast5'
 #ONT_KIT = 'FLO-MIN106'
@@ -64,19 +66,30 @@ rule preprocess:
         'python3 scripts/deduplicate.py '
         '| gzip -9 > {output}'
 
-rule plot_quals:
-    input: '{somefile}.fastq'
-    output: '{somefile}/NanoPlot-report.html'
+NANOPLOT_CMD = ('{CUSTOM_CONDA3} NanoPlot '
+                '--fastq {input} '
+                '-t {threads} '
+                '--loglength '
+                '-o {params.outdir} '
+                '--maxlength 100000 '
+                '--percentqual '
+                '--plots hex dot')
+
+rule raw_plot_quals:
+    input: 'data/chr20.fastq'
+    output: 'plots/raw_quals/NanoPlot-report.html'
+    params:
+        outdir='plots/raw_quals'
     threads: THREADS
-    shell:
-        '{CUSTOM_CONDA3} NanoPlot '
-        '--fastq {input} '
-        '-t {threads} '
-        '--loglength '
-        '-o {wildcards.somefile} '
-        '--maxlength 100000 '
-        '--percentqual '
-        '--plots hex dot'
+    shell: NANOPLOT_CMD
+
+rule porechop_plot_quals:
+    input: rules.porechop.output
+    output: 'plots/porechop_quals/NanoPlot-report.html'
+    params:
+        outdir='plots/porechop_quals'
+    threads: THREADS
+    shell: NANOPLOT_CMD
 
 rule filter:
     input:
@@ -109,11 +122,11 @@ rule miniasm:
         fasta='4_miniasm/assembled.fasta',
         gfa='4_miniasm/miniasm_graph.gfa'
     shell:
-        "set +u; {CONDA} minimap2 -x ava-ont {input} {input} > {output.paf}; "
+        "{CONDA} minimap2 -x ava-ont {input} {input} > {output.paf}; "
         "{CONDA} miniasm -f {input} {output.paf} > {output.gfa}; "
         "bash scripts/fold_fasta.sh {output.gfa} > {output.fasta}"
 
-RACON_COMMAND = ('set +u; {CONDA} minimap2 -x map-ont '
+RACON_COMMAND = ('{CONDA} minimap2 -x map-ont '
                  '-t {threads} {input.assembly} {input.filtered} '
                  '> {output.paf}; '
                  '{CUSTOM_CONDA3} racon -t {threads} '
@@ -176,7 +189,7 @@ rule quast:
 ## alignment branch
 rule ngmlr:
     input:
-        reference='db/chr20_GRCh38.fa.gz',
+        reference='db/chr20.fa',
         reads=rules.filter.output
     output: 'alignment/ngmlr/output.sorted.bam'
     threads: THREADS
@@ -201,7 +214,34 @@ rule sniffles:
     shell:
         '{CONDA} source {HUMAN_SV_SOURCE_FILE} && sniffles -m {input.bam} -v {output}'
 
+rule survivor:
+    input: rules.assemblytics.output
+    output: '10_survivor/assemblytics_sv.vcf'
+    params:
+        bedfile=str(rules.assemblytics.output).replace('sentinel', 'Assemblytics_structural_variants.bed')
+    shell:
+        '{CONDA_QUAST} SURVIVOR convertAssemblytics '
+        '{params.bedfile} 0 {output}'
+
+
+rule vcf2tab:
+    input: '{somefile}.vcf'
+    output: '{somefile}.tab'
+    shell:
+        '{CONDA} python scripts/vcf2tab.py {input} > {output}'
+
+rule svpv:
+    input:
+        bam=rules.ngmlr.output,
+        vcf=rules.sniffles.output
+    output: '11_svpv/sentinel.txt'
+    shell:
+        '{CONDA_QUAST} SVPV -vcf {input.vcf} -aln {input.bam} -o 11_svpv -samples output; '
+        'touch {output}'
+
+
 rule all:
     input:
-        sniffles=rules.sniffles.output,
-        assemblytics=rules.assemblytics.output
+        assemblytics=str(rules.survivor.output).replace('vcf', 'tab'),
+        sniffles=str(rules.sniffles.output).replace('vcf', 'tab'),
+        plot_quals=[rules.porechop_plot_quals.output, rules.raw_plot_quals.output]

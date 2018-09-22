@@ -12,13 +12,30 @@ vcr <- read.vcf(REFERENCE)
 dtm <- as.data.table(vcm$vcf)
 dtr <- as.data.table(vcr$vcf)
 
-# Extract Info fields
-dtm_info <- as.data.table(t(strsplit(dtm$INFO, ";")))
 
+# Extract Info fields
 dtm_info <- dtm[1:nrow(dtm), tstrsplit(INFO, ";"),]
 dtr_info <- dtr[1:nrow(dtr), tstrsplit(INFO, ";"),]
 
-dtm_info_split <- dtm_info[, .(SVTYPE = tstrsplit(V2, '=' )[2], CHR2 = tstrsplit(V4, "=")[2], END = tstrsplit(V5, "="), SVLEN = tstrsplit(V6, "=")),]
+dtm_info_split <- dtm_info[, .(SVTYPE = strsplit(V2, '=' )[[2]], CHR2 = strsplit(V4, "=")[[2]], END = strsplit(V5, "=")[[2]], SVLEN = strsplit(V6, "=")[[2]]),]
 
-dtr_info_split <- dtm_info[, .(SVTYPE = tstrsplit(V2, '=' )[2], CHR2 = tstrsplit(V4, "=")[2], END = tstrsplit(V5, "="), SVLEN = tstrsplit(V6, "=")),]
+dtr_info_split <- dtr_info[, .(SVTYPE = strsplit(V3, '=' )[[2]], CHR2 = strsplit(V4, "=")[[2]], END = strsplit(V1, "=")[[2]], SVLEN = strsplit(V2, "=")[[2]]),]
+
+dtm[,METHOD := 'ASSEMBLY'] 
+dtr[,METHOD := 'REFERENCE']
+
+dt <- rbind(cbind(dtm[,-"INFO"], dtm_info_split),
+      cbind(dtr[,-"INFO"], dtr_info_split), fill = TRUE)
+
+# Filtering stuff
+
+dt_filt <- dt[SVLEN>30,,]
+dt_highqual <- dt[FILTER != "LowQual",,]
+
+
+
+# Plot stuff
+
+
+
 
